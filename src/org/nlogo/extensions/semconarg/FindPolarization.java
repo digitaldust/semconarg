@@ -270,7 +270,7 @@ public class FindPolarization extends DefaultReporter {
 //            System.out.println("arg: " + s + " è presente in myself: " + seeIfMyselfMember);
 //            System.out.println("arg: " + s + " è presente in self: " + seeIfSelfMember);
             if ((!seeIfMyselfMember && seeIfSelfMember) || (seeIfMyselfMember && !seeIfSelfMember)) {
-                AFdistance++;
+                AFdistance++; 
             }
         }
         AFdistance /= SemConArg.g.getVertexCount();
