@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.8.4
+Created-By: 1.6.0_45-b06-451-11M4406 (Apple Inc.)
+Extension-Name: semconarg
+Class-Manager: org.nlogo.extensions.semconarg.SemConArg
+NetLogo-Extension-API-Version: 5.0
+

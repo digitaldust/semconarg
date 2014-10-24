@@ -1,0 +1,5 @@
+How to compile SemConArg:
+
+javac -classpath "lib/*::/Applications/NetLogo 5.0/NetLogo.jar" -d classes src/semconarg/AF.java src/semconarg/SemConArg.java src/semconarg/Semantic.java src/semconarg/ExportAspartix.java src/semconarg/Initialize.java src/semconarg/FavoriteColor.java src/semconarg/FindPolarization.java src/semconarg/HistogramExtensions.java src/semconarg/KnowledgeEvolution.java src/semconarg/ArgFrameEvolution.java src/semconarg/Soluzioni.java src/semconarg/MyEdge.java src/semconarg/Soluzioni.java src/semconarg/GiveWeights.java
+
+jar cvfm /Users/ogabbrie/Dropbox/Simone-Paolo/projects/Twitter-like/NetLogo/semconarg/semconarg.jar manifest.txt -C classes .

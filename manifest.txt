@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Extension-Name: semconarg
+Class-Manager: semconarg.SemConArg
+NetLogo-Extension-API-Version: 5.0
+
+
