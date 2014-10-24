@@ -4,15 +4,13 @@
  */
 package org.nlogo.extensions.semconarg;
 
-import java.util.HashMap;
-import java.util.Random;
+import org.nlogo.agent.World;
 import org.nlogo.api.Argument;
 import org.nlogo.api.Context;
 import org.nlogo.api.DefaultReporter;
 import org.nlogo.api.ExtensionException;
 import org.nlogo.api.LogoException;
 import org.nlogo.api.LogoList;
-import org.nlogo.api.Syntax;
 
 /**
  *
@@ -32,15 +30,14 @@ public class FavoriteColor extends DefaultReporter {
      */
     @Override
     public Double report(Argument[] argmnts, Context cntxt) throws ExtensionException, LogoException {
-        LogoList favorite = argmnts[0].getList();
-        LogoList all = argmnts[1].getList();
-        Random random = new Random();
-        for (Object ext : all) {
-            if(!SemConArg.cachedColors.containsKey((LogoList)ext)){
-                SemConArg.cachedColors.put((LogoList)ext, (double)random.nextInt(138));
-            }
-        }
-        return SemConArg.cachedColors.get(favorite);
+        // retrieve world
+        World world = (World) cntxt.getAgent().world();
+        // retrieve the index of the semantic extensions variable - CAN BE DONE JUST ONCE!!!
+        int AF = world.indexOfVariable(next, "AF");
+        // retrieve logolist of semanti extensions for this agent
+        LogoList semanticExtensions = (LogoList) next.getVariable(AF);
+        // 
+        return SemConArg.cachedColors.get(semanticExtensions);
     }
     
 }

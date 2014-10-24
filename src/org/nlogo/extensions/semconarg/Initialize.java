@@ -9,22 +9,24 @@ import org.nlogo.api.LogoException;
 import org.nlogo.api.LogoList;
 
 /**
- *
- * @author Simone Gabbriellini
+ * Initialize some data structure, done each time setup is pressed.
+ * 
+ * @author Dr. Simone Gabbriellini
  */
 public class Initialize extends DefaultCommand {
 
     @Override
     public void perform(Argument[] argmnts, Context cntxt) throws ExtensionException, LogoException {
-    
-        SemConArg.cachedColors = new HashMap<LogoList, Double>();
-        SemConArg.g = null;
+
+        SemConArg.alpha = 0;
         SemConArg.numNodi = 0;
-        SemConArg.cachedExt = null;
-        SemConArg.alreadyKnowWhen = null;
-        SemConArg.keyKnowWhen = null;
+        SemConArg.maxWeightForFuzzySemiring = 100;
         SemConArg.isWeighted = false;
         SemConArg.weightList = null;
-        SemConArg.alpha = 0;
+        SemConArg.cachedExt = new HashMap<LogoList, LogoList>();
+        SemConArg.cachedColors = new HashMap<LogoList, Double>();
+        SemConArg.extHist = new HashMap<LogoList, Double>();
+        SemConArg.counter = 1d;
     }
+    
 }
