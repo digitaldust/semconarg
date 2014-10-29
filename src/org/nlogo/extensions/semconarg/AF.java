@@ -1,5 +1,6 @@
 package org.nlogo.extensions.semconarg;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import edu.uci.ics.jung.graph.DirectedOrderedSparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
@@ -8,6 +9,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 import org.nlogo.api.*;
+import org.nlogo.agent.Agent;
 
 /**
  *
@@ -37,7 +39,7 @@ public class AF extends DefaultReporter {
      */
     @Override
     public Syntax getSyntax() {
-        return Syntax.reporterSyntax(new int[]{Syntax.ListType(), Syntax.StringType()}, Syntax.ListType());
+        return Syntax.reporterSyntax(new int[]{Syntax.ListType()}, Syntax.ListType());
     }
 
     /**
@@ -58,24 +60,27 @@ public class AF extends DefaultReporter {
             LogoList semanticExtensions;
             // retrieve turtle's AF as a logolist like [[0 1] [0 0]]
             LogoList list = argmnts[0].getList();
+            // 
+            if (SemConArg.first == null) {
+                SemConArg.first = list;
+            }
             // if there is nothing in the AF of the agent
             if (list.isEmpty()) {
                 // throw an exception, something went wrong
                 throw new ExtensionException("SemanticExtensions needs at least one agent with an AF");
             } else {
+
                 // check if this framework is already present
-                if (SemConArg.cachedExt.containsKey(list)) {
+                if (SemConArg.cachedSemanticExtensions.containsKey(list)) {
                     // if the AF is already present in the cached results
-                    semanticExtensions = SemConArg.cachedExt.get(list);
+                    semanticExtensions = SemConArg.cachedSemanticExtensions.get(list);
                 } else {
                     // AF not present yet, creates it
                     DirectedOrderedSparseMultigraph<Integer, MyEdge> g = createAF(list);
                     // find new semantic extensions
                     semanticExtensions = findSemanticExtensions(g);
                     // save the AF and its solutions
-                    SemConArg.cachedExt.put(list, semanticExtensions);
-                    // add this extension to colors
-                    SemConArg.cachedColors.put(list, findRightColor(cntxt, semanticExtensions));
+                    SemConArg.cachedSemanticExtensions.put(list, semanticExtensions);
                 }
             }
             // return the semantic extensions
@@ -132,7 +137,7 @@ public class AF extends DefaultReporter {
      * @return a logolist with the semantic extensions
      */
     private LogoList findSemanticExtensions(DirectedOrderedSparseMultigraph<Integer, MyEdge> g) {
-        
+
         // instantiate a new object that holds the abstract argumentation computations
         Soluzioni soluzione = new Soluzioni(g);
         // holds solutions computed by Francesco Santini's procedures
@@ -147,14 +152,12 @@ public class AF extends DefaultReporter {
         }
         // create a NetLogo list to hold admissible extensions
         LogoListBuilder semanticExtensions = new LogoListBuilder();
-        // find extension sets
-        Set<ArrayList<Double>> se = Sets.newHashSet();
         // assure that each extension is sorted, so that [0 1] and [1 0] are mapped
         // to [0 1] to facilitate further processes like counting and so on...
         // converti _matriceSoluzione_ in _se_
         for (int i = 0; i < matriceSoluzione.length; i++) {
             // build the inner logo list
-            LogoListBuilder inner = new LogoListBuilder();
+            ArrayList<Double> inner = Lists.newArrayList();
             for (int j = 0; j < SemConArg.numNodi; j++) {
                 // if this argument should be added
                 if (matriceSoluzione[i][j] == 1) {
@@ -164,29 +167,29 @@ public class AF extends DefaultReporter {
             }
             // order the values
             Collections.sort(inner);
-            // if not present already, add this extension to the histogram keys
-            if(!SemConArg.extHist.containsKey(inner.toLogoList())){
-                // add the logolist and identify this with a counter, which will be
-                // later on reported to NetLogo to histogram how many times a
-                // particular extension is present
-                SemConArg.extHist.put(inner.toLogoList(), SemConArg.counter);
-                // increment the counter
-                SemConArg.counter += 1;
-            } 
+            // inner logo list
+            LogoListBuilder innerList = new LogoListBuilder();
+            // transform to logolist
+            for (Double d : inner) {
+                innerList.add(d);
+            }
+            LogoList innerLogoList = innerList.toLogoList();
             // add this set to the 
-            semanticExtensions.add(inner.toLogoList());
+            semanticExtensions.add(innerLogoList);
+        }
+        // UPDATE HISTOGRAM EXTENSIONS
+        LogoList semExt = semanticExtensions.toLogoList();
+        // if not present already, add this extension to the histogram keys
+        if (!SemConArg.extHist.containsKey(semExt)) {
+                // add the logolist and identify this with a counter, which will be
+            // later on reported to NetLogo to histogram how many times a
+            // particular extension is present
+            SemConArg.extHist.put(semExt, SemConArg.counter);
+            // increment the counter
+            SemConArg.counter += 1;
         }
         // return semantic extension to NetLogo list
-        return semanticExtensions.toLogoList();
+        return semExt;
     }
-    
-    /**
-     * Should assign a color to the turtle according to what 
-     * @param cntxt
-     * @param semanticExtensions
-     * @return
-     */
-    private Double findRightColor(Context cntxt, LogoList semanticExtensions) {
-        return cntxt.getRNG().nextDouble() * 138d;
-    }
+
 }

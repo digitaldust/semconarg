@@ -2,6 +2,7 @@ package org.nlogo.extensions.semconarg;
 
 import org.nlogo.agent.Agent;
 import org.nlogo.agent.World;
+import org.nlogo.api.AgentException;
 import org.nlogo.api.Argument;
 import org.nlogo.api.Context;
 import org.nlogo.api.DefaultReporter;
@@ -43,14 +44,14 @@ public class HistogramExtensions extends DefaultReporter {
         while (iterator.hasNext()) {
             // retrieve the agent
             Agent next = iterator.next();
-            // retrieve the index of the semantic extensions variable - CAN BE DONE JUST ONCE!!!
-            int semExt = world.indexOfVariable(next, "SEMANTIC-EXTENSIONS");
-            // retrieve logolist of semanti extensions for this agent
-            LogoList variable = (LogoList) next.getVariable(semExt);
-            // for each set of extensions
-            for (Object ext : variable) {
+            // retrieve the index of the semantic extensions variable
+            LogoList semanticExtensions;
+            try {
+                semanticExtensions = (LogoList) next.getTurtleOrLinkVariable("SEMANTIC-EXTENSIONS");
                 // add to histogram the correnspoding double for this extension
-                histogram.add(SemConArg.extHist.get((LogoList) ext));
+                histogram.add(SemConArg.extHist.get(semanticExtensions));
+            } catch (AgentException ex) {
+                throw new ExtensionException(ex);
             }
         }
         // return the logolist for the histogram

@@ -23,10 +23,12 @@ public class Initialize extends DefaultCommand {
         SemConArg.maxWeightForFuzzySemiring = 100;
         SemConArg.isWeighted = false;
         SemConArg.weightList = null;
-        SemConArg.cachedExt = new HashMap<LogoList, LogoList>();
-        SemConArg.cachedColors = new HashMap<LogoList, Double>();
+        SemConArg.cachedSemanticExtensions = new HashMap<LogoList, LogoList>();
+        SemConArg.cachedAFColors = new HashMap<LogoList, Double>();
+        SemConArg.cachedArgumentLabels = new HashMap<LogoList, LogoList>();
         SemConArg.extHist = new HashMap<LogoList, Double>();
         SemConArg.counter = 1d;
+        SemConArg.first = null;
     }
     
 }
