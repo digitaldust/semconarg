@@ -29,7 +29,7 @@ public class SemConArg extends DefaultClassManager {
     public static int maxWeightForFuzzySemiring = 100;
     // Cache for each AF as a list, the corresponding semantic extensions computed
     public static HashMap<LogoList, LogoList> cachedSemanticExtensions;
-    // The list of cached extension along with the counter, used to hist them
+    // The list of cached semantic extension along with the counter used to label each semantic extension
     public static HashMap<LogoList, Double> extHist;
     public static Double counter;
     // List of colors for extensions.
@@ -65,6 +65,8 @@ public class SemConArg extends DefaultClassManager {
         primitiveManager.addPrimitive("hist-extensions", new HistogramExtensions());
         // DEBUG
         primitiveManager.addPrimitive("debug", new Debug());
+        // output extension labels for histogram
+        primitiveManager.addPrimitive("label-ext", new OutputExtensionLabels());
 
     }
 }

@@ -1,15 +1,19 @@
 package org.nlogo.extensions.semconarg;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import edu.uci.ics.jung.graph.DirectedOrderedSparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import org.nlogo.api.*;
-import org.nlogo.agent.Agent;
+import org.nlogo.agent.World;
 
 /**
  *
@@ -78,7 +82,7 @@ public class AF extends DefaultReporter {
                     // AF not present yet, creates it
                     DirectedOrderedSparseMultigraph<Integer, MyEdge> g = createAF(list);
                     // find new semantic extensions
-                    semanticExtensions = findSemanticExtensions(g);
+                    semanticExtensions = findSemanticExtensions(g, cntxt);
                     // save the AF and its solutions
                     SemConArg.cachedSemanticExtensions.put(list, semanticExtensions);
                 }
@@ -87,6 +91,8 @@ public class AF extends DefaultReporter {
             return semanticExtensions;
         } catch (LogoException e) {
             throw new ExtensionException(e.getMessage());
+        } catch (AgentException ex) {
+            throw new ExtensionException(ex.getMessage());
         }
     }
 
@@ -136,7 +142,7 @@ public class AF extends DefaultReporter {
      * @param g
      * @return a logolist with the semantic extensions
      */
-    private LogoList findSemanticExtensions(DirectedOrderedSparseMultigraph<Integer, MyEdge> g) {
+    private LogoList findSemanticExtensions(DirectedOrderedSparseMultigraph<Integer, MyEdge> g, Context cntxt) throws AgentException, LogoException {
 
         // instantiate a new object that holds the abstract argumentation computations
         Soluzioni soluzione = new Soluzioni(g);
@@ -181,15 +187,34 @@ public class AF extends DefaultReporter {
         LogoList semExt = semanticExtensions.toLogoList();
         // if not present already, add this extension to the histogram keys
         if (!SemConArg.extHist.containsKey(semExt)) {
-                // add the logolist and identify this with a counter, which will be
+            World world = (World) cntxt.getAgent().world();
+            world.setObserverVariableByName("EXT-CHANGED?", true);
+            // add the logolist and identify this with a counter, which will be
             // later on reported to NetLogo to histogram how many times a
             // particular extension is present
             SemConArg.extHist.put(semExt, SemConArg.counter);
             // increment the counter
             SemConArg.counter += 1;
         }
+        // sort extHist by values - useful for OutputExtensionLabels
+        SemConArg.extHist = sortByValue(SemConArg.extHist);
         // return semantic extension to NetLogo list
         return semExt;
     }
 
+    public static <LogoList, Double extends Comparable<? super Double>> HashMap<LogoList, Double>
+            sortByValue(HashMap<LogoList, Double> map) {
+        List<HashMap.Entry<LogoList, Double>> list = new LinkedList<HashMap.Entry<LogoList, Double>>(map.entrySet());
+        Collections.sort(list, new Comparator<HashMap.Entry<LogoList, Double>>() {
+            @Override
+            public int compare(Map.Entry<LogoList, Double> o1, Map.Entry<LogoList, Double> o2) {
+                return (o1.getValue()).compareTo(o2.getValue());
+            }
+        });
+        HashMap<LogoList, Double> result = new LinkedHashMap<LogoList, Double>();
+        for (Map.Entry<LogoList, Double> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
+    }
 }

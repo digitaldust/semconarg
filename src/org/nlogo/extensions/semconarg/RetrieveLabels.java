@@ -44,12 +44,15 @@ public class RetrieveLabels extends DefaultReporter {
                     org.nlogo.agent.World world = (org.nlogo.agent.World) cntxt.getAgent().world();
                     // argument list
                     LogoList argumentList = (LogoList) world.getObserverVariableByName("ARGUMENTLIST");
+                    Double skeptical = (Double)world.getObserverVariableByName("SKEPTICAL");
+                    Double credolous = (Double)world.getObserverVariableByName("CREDOLOUS");
+                    Double nope = (Double)world.getObserverVariableByName("NOPE");
                     // retrieve the calling agent
                     Turtle t = (Turtle) cntxt.getAgent();
                     // retrieve his semantic extensions
                     LogoList semanticExtensions = (LogoList)t.getVariable("SEMANTIC-EXTENSIONS");
                     // find the arguments labels
-                    argumentLabels = findAssociateLabels(cntxt, semanticExtensions, argumentList);
+                    argumentLabels = findAssociateLabels(cntxt, semanticExtensions, argumentList, skeptical, credolous, nope);
                     // save the AF and the labels associated to its arguments
                     SemConArg.cachedArgumentLabels.put(list, argumentLabels);
                 }
@@ -63,7 +66,7 @@ public class RetrieveLabels extends DefaultReporter {
         }
     }
     
-    public LogoList findAssociateLabels(Context cntxt, LogoList semanticExtensions, LogoList argumentList) throws ExtensionException {
+    public LogoList findAssociateLabels(Context cntxt, LogoList semanticExtensions, LogoList argumentList, Double skeptical, Double credolous, Double nope) throws ExtensionException {
         /**
          * Find if each of the argument are credolous, skeptical or not accepted
          * by reporting an array for a,b,c and extensions like [a b] [b c]: [0.5
@@ -91,13 +94,13 @@ public class RetrieveLabels extends DefaultReporter {
             // if the argument is in all the extensions
             if (counter == semanticExtensions.size()) {
                 // the argument is skeptical accepted
-                accepted.add(1d);
+                accepted.add(skeptical);
             } else if (counter == 0) {
                 // if it is in no extension then it is never accepted
-                accepted.add(0d);
+                accepted.add(nope);
             } else {
                 // finally if it is in some extensions then it is credolous accepted
-                accepted.add(0.5);
+                accepted.add(credolous);
             }
         }
         return accepted.toLogoList();

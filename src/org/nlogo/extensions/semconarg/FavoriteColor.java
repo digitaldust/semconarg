@@ -4,10 +4,6 @@
  */
 package org.nlogo.extensions.semconarg;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.nlogo.agent.Turtle;
-import org.nlogo.api.AgentException;
 import org.nlogo.api.Argument;
 import org.nlogo.api.Context;
 import org.nlogo.api.DefaultReporter;
